@@ -1,7 +1,7 @@
 const { JSDOM } = require("jsdom");
 const fs = require("fs");
 const path = require("path");
-const html = fs.readFileSync(path.resolve(__dirname, "../index.html"), "utf8");
+const html = fs.readFileSync(path.resolve(__dirname, "../frontend/index.html"), "utf8");
 
 describe("Recipe Recommender UI", () => {
     let dom;

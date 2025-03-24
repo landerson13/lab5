@@ -19,7 +19,9 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "jsdo": "^4.3.12",
     "jsdom": "^26.0.0",
     "supertest": "^7.1.0"
   }
+  
 }
