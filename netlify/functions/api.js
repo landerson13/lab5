@@ -1,18 +1,17 @@
-// netlify/functions/api.js
 import express from "express";
 import fetch from "node-fetch";
 import dotenv from "dotenv";
 import serverless from "serverless-http";
 
-dotenv.config(); // Loads environment variables from the .env file
+dotenv.config();
 
 const api = express();
 const router = express.Router();
 
-// Get your Spoonacular API Key from the environment
+// API key for spoonacular 
 const API_KEY = process.env.SPOONACULAR_API_KEY;
 
-// Recipe search endpoint
+// The recipe search endpoint
 router.get("/recipes", async (req, res) => {
   const query = req.query.query;
   const dietaryRestrictions = req.query.dietaryRestrictions;
@@ -26,24 +25,24 @@ router.get("/recipes", async (req, res) => {
       `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(query)}&diet=${dietaryRestrictions}&apiKey=${API_KEY}`
     );
 
-    // Check for successful response
+    // Throws error if response is not valid
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
 
-    // Get the data in JSON format
+    // Gets the response data
     const data = await response.json();
 
     // Respond with recipe search results
     res.json(data);
-  } catch (error) {
+  } 
+  
+  catch (error) {
     res.status(500).json({ error: "Server error" });
   }
 });
 
-// Use the router for handling routes
-api.use("/api/", router);
 
-// Export the handler for serverless deployment
+api.use("/api/", router);
 export const handler = serverless(api);
 
