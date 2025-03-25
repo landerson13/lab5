@@ -10,11 +10,12 @@ async function getRecipes() {
     try {
         // Construct the query with ingredients and dietary restrictions
         const queryParams = new URLSearchParams();
-        queryParams.append('query', ingredients);
+        queryParams.append('query', ingredients); // Ingredients as query
         if (dietaryRestrictions) {
             queryParams.append('diet', dietaryRestrictions);  // Assuming the API accepts this parameter
         }
 
+        // Fetching the recipes from the backend (Netlify function)
         const response = await fetch(`/.netlify/functions/api/recipes?${queryParams.toString()}`);
         
         if (!response.ok) {
@@ -22,7 +23,7 @@ async function getRecipes() {
         }
         
         const data = await response.json();
-        
+
         // Render the results dynamically
         document.getElementById('results').innerHTML = data.results.map(recipe => `
             <div class="recipe">

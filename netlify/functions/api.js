@@ -1,65 +1,70 @@
-const express = require("express");
-const serverless = require("serverless-http");
-const fetch = require("node-fetch");
-const dotenv = require("dotenv");
+import express from "express";
+import serverless from "serverless-http";
+import fetch from "node-fetch";
+import dotenv from "dotenv";
 
+// Load environment variables
 dotenv.config();
-const app = express();
+
+const api = express();
 const router = express.Router();
 
-const API_KEY = process.env.SPOONACULAR_API_KEY;
-
-if (!API_KEY) {
-  console.error("API key is missing. Please set your SPOONACULAR_API_KEY in .env file.");
-}
-
-// Middleware to parse JSON
-app.use(express.json());
+// Get Spoonacular API Key from .env file
+const API_KEY = process.env.SPOONACULAR_API_KEY; // Add your Spoonacular API key in .env
 
 // Endpoint to search for recipes
 router.get("/recipes", async (req, res) => {
+  const query = req.query.query;
+  if (!query) {
+    return res.status(400).json({ error: "Query parameter is required" });
+  }
+
   try {
-    const query = req.query.query;
-    if (!query) {
-      return res.status(400).json({ error: "Query parameter is required" });
-    }
-    
     const response = await fetch(
       `https://api.spoonacular.com/recipes/complexSearch?query=${encodeURIComponent(query)}&apiKey=${API_KEY}`
     );
-    
+
+    // Check for a successful response
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
-    
+
+    // Get the data in JSON format
     const data = await response.json();
+
+    // Respond with the data
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// Endpoint to get recipe details
+// Endpoint to get recipe details by ID
 router.get("/recipes/:id/information", async (req, res) => {
+  const recipeId = req.params.id;
+
   try {
-    const recipeId = req.params.id;
     const response = await fetch(
       `https://api.spoonacular.com/recipes/${recipeId}/information?apiKey=${API_KEY}`
     );
-    
+
+    // Check for a successful response
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
-    
+
+    // Get the data in JSON format
     const data = await response.json();
+
+    // Respond with the recipe details
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-// Using the router
-app.use("/.netlify/functions/api", router);  // Base path to the API
+// Use this route for the API
+api.use("/.netlify/functions/api", router);
 
-// Export handler for serverless
-module.exports.handler = serverless(app);
+// Export for serverless deployment
+export const handler = serverless(api);
