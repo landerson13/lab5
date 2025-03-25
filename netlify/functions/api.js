@@ -4,10 +4,17 @@ const fetch = require("node-fetch");
 const dotenv = require("dotenv");
 
 dotenv.config();
-const api = express();
+const app = express();
 const router = express.Router();
 
 const API_KEY = process.env.SPOONACULAR_API_KEY;
+
+if (!API_KEY) {
+  console.error("API key is missing. Please set your SPOONACULAR_API_KEY in .env file.");
+}
+
+// Middleware to parse JSON
+app.use(express.json());
 
 // Endpoint to search for recipes
 router.get("/recipes", async (req, res) => {
@@ -51,5 +58,8 @@ router.get("/recipes/:id/information", async (req, res) => {
   }
 });
 
-api.use("/api/", router);
-module.exports.handler = serverless(api);
+// Using the router
+app.use("/.netlify/functions/api", router);  // Base path to the API
+
+// Export handler for serverless
+module.exports.handler = serverless(app);

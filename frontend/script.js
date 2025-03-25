@@ -1,12 +1,21 @@
 async function getRecipes() {
-    const query = document.getElementById('ingredients').value;
-    if (!query) {
+    const ingredients = document.getElementById('ingredients').value;
+    const dietaryRestrictions = document.getElementById('dietaryRestrictions').value;
+
+    if (!ingredients) {
         alert("Please enter ingredients to search for recipes.");
         return;
     }
     
     try {
-        const response = await fetch(`/.netlify/functions/api/recipes?query=${encodeURIComponent(query)}`);
+        // Construct the query with ingredients and dietary restrictions
+        const queryParams = new URLSearchParams();
+        queryParams.append('query', ingredients);
+        if (dietaryRestrictions) {
+            queryParams.append('diet', dietaryRestrictions);  // Assuming the API accepts this parameter
+        }
+
+        const response = await fetch(`/.netlify/functions/api/recipes?${queryParams.toString()}`);
         
         if (!response.ok) {
             throw new Error("Failed to fetch recipes");
@@ -14,6 +23,7 @@ async function getRecipes() {
         
         const data = await response.json();
         
+        // Render the results dynamically
         document.getElementById('results').innerHTML = data.results.map(recipe => `
             <div class="recipe">
                 <h3>${recipe.title}</h3>

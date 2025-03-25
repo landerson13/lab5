@@ -23,5 +23,4 @@ describe("Spoonacular API", () => {
     const res = await request(handler).get(`/.netlify/functions/api/recipes/9999999/information`);
     expect(res.statusCode).toBe(500);
   });
-
 });
